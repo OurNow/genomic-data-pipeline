@@ -104,9 +104,9 @@ jobs:
       # Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: List files in cleaned data directory
-        run: |
-          ls -alh ./cleaned_data
+      # - name: List files in cleaned data directory
+      #   run: |
+      #     ls -alh ./cleaned_data
       # Set up AWS credentials to export data to S3
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
