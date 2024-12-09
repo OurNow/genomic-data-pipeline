@@ -3,10 +3,10 @@ name: Genomic Data Pipeline
 on:
   push:
     branches:
-      - main
+      - main  # Trigger on push to the main branch
   pull_request:
     branches:
-      - main
+      - main  # Trigger on pull request to the main branch
   workflow_dispatch:   # Allows manual triggering of the workflow
 
 jobs:
@@ -43,7 +43,7 @@ jobs:
           python visualize.py
 
       - name: Upload results as artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3   # Updated version here!
         with:
           name: results
           path: ./results/
