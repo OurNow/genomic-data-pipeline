@@ -5,3 +5,4 @@ seaborn==0.11.1
 numpy==1.21.0
 boto3==1.18.0  # If you're using AWS S3 for data storage
 plotly>=5.0.0
+requests==2.26.0  # Add this for API requests
