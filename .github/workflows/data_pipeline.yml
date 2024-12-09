@@ -116,11 +116,11 @@ jobs:
           aws-region: ap-south-1  # Update with your preferred AWS region
 
       # Upload cleaned genomic data to AWS S3
-      - name: Upload cleaned data to AWS S3
-        run: |
-          aws s3 cp ./cleaned_data/cleaned_real_time_genomic_data.csv s3://genomicbucket/cleaned_data/
-          # Replace 'genomicbucket' with your actual S3 bucket name
-          # Replace 'cleaned_data/' with your desired S3 directory path
+      # - name: Upload cleaned data to AWS S3
+      #   run: |
+      #     aws s3 cp cleaned_real_time_genomic_data.csv s3://genomicbucket/cleaned_data/
+      #     # Replace 'genomicbucket' with your actual S3 bucket name
+      #     # Replace 'cleaned_data/' with your desired S3 directory path
 
       # Upload visualization results to AWS S3
       - name: Upload visualizations to AWS S3
