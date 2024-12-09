@@ -2,6 +2,7 @@ import pandas as pd
 
 # Load the real-time genomic data
 df = pd.read_csv('real_time_genomic_data.csv')
+print(df.columns)
 
 # Clean the data (e.g., handle missing values, correct data types)
 df_clean = df.dropna()  # Or apply other cleaning steps
