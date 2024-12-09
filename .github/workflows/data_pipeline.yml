@@ -45,7 +45,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: cleaned-genomic-data
-          path: cleaned_genomic_data.csv
+          path: cleaned_real_time_genomic_data.csv
 
   analysis_and_visualization:
     needs: generate_and_process_data
