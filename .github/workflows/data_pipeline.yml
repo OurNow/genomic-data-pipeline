@@ -1,8 +1,15 @@
-name: Automated Ensembl Data Workflow
+name: Automated and Manual Ensembl Data Workflow
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # Runs daily at midnight UTC
+    - cron: '30 18 * * *'  # Runs daily at 18:30 UTC (Midnight IST)
+  push:  # Trigger the workflow on push
+    branches:
+      - main
+  pull_request:  # Trigger on pull requests
+    branches:
+      - main
+  workflow_dispatch:  # Allow manual triggers via the GitHub Actions UI
 
 jobs:
   check-ensembl-updates:
@@ -43,7 +50,7 @@ jobs:
 
   run-pipeline:
     needs: check-ensembl-updates
-    if: env.release_updated == 'true'
+    if: env.release_updated == 'true' || github.event_name != 'schedule'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
