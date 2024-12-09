@@ -44,4 +44,4 @@ df.loc[outlier_indices, 'ExpressionLevel'] = np.random.uniform(150, 500, size=50
 df.to_csv('cleaned_genomic_data.csv', index=False)
 
 # Display the first few rows to verify the data
-df.head()
+print(df.head())
