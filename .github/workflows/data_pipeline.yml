@@ -3,47 +3,87 @@ name: Genomic Data Pipeline
 on:
   push:
     branches:
-      - main  # Trigger on push to the main branch
+      - main
   pull_request:
     branches:
-      - main  # Trigger on pull request to the main branch
-  workflow_dispatch:   # Allows manual triggering of the workflow
+      - main
 
 jobs:
-  data_processing:
+  generate_and_process_data:
     runs-on: ubuntu-latest
-
+    
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
+      # Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      # Set up Python
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: '3.8'
 
+      # Install dependencies from requirements.txt
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
 
+      # Step 1: Generate synthetic genomic data
       - name: Generate synthetic genomic data
         run: |
           python data_generation.py
 
-      - name: Data processing and analysis
+      # Step 2: Process and clean the data
+      - name: Process and clean the data
         run: |
           python data_processing.py
 
-      - name: Run analysis
+      # Step 3: Upload cleaned data as artifact for later use
+      - name: Upload cleaned genomic data
+        uses: actions/upload-artifact@v3
+        with:
+          name: cleaned-genomic-data
+          path: cleaned_genomic_data.csv
+
+  analysis_and_visualization:
+    needs: generate_and_process_data
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository again
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.8'
+
+      # Install dependencies from requirements.txt
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      # Step 1: Download the cleaned genomic data artifact
+      - name: Download cleaned genomic data artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: cleaned-genomic-data
+
+      # Step 2: Run analysis
+      - name: Run data analysis
         run: |
           python analysis.py
 
-      - name: Visualization
+      # Step 3: Run visualizations
+      - name: Run visualizations
         run: |
           python visualize.py
-
-      - name: Upload results as artifacts
-        uses: actions/upload-artifact@v3   # Updated version here!
+          
+      # Step 4: Upload the visualization results (e.g., saved as .png, .pdf, etc.)
+      - name: Upload visualizations as artifact
+        uses: actions/upload-artifact@v3
         with:
-          name: results
-          path: ./results/
+          name: visualizations
+          path: ./visualizations/*.png  # Assuming visualizations are saved as PNG files
