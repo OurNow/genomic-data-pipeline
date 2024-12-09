@@ -13,9 +13,46 @@ on:
 jobs:
   generate_and_process_data:
     runs-on: ubuntu-latest
-
+    
     steps:
       # Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      # Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.8'
+
+      # Install dependencies from requirements.txt
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      # Step 1: Generate synthetic genomic data
+      - name: Generate synthetic genomic data
+        run: |
+          python data_generation.py
+
+      # Step 2: Process and clean the data
+      - name: Process and clean the data
+        run: |
+          python data_processing.py
+
+      # Step 3: Upload cleaned data as artifact for later use
+      - name: Upload cleaned genomic data
+        uses: actions/upload-artifact@v3
+        with:
+          name: cleaned-genomic-data
+          path: cleaned_genomic_data.csv
+
+  analysis_and_visualization:
+    needs: generate_and_process_data
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository again
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -25,30 +62,31 @@ jobs:
         with:
           python-version: '3.8'
 
-      # Install dependencies
+      # Install dependencies from requirements.txt
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
 
-      # Generate synthetic genomic data (if not already in the repo)
-      - name: Generate synthetic genomic data
-        run: |
-          python data_generation.py  # This generates the 'synthetic_genomic_data.csv' file
+      # Step 1: Download the cleaned genomic data artifact
+      - name: Download cleaned genomic data artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: cleaned-genomic-data
+          path: ./  # Download to the current directory
 
-      # Run data processing and analysis
+      # Step 2: Run analysis
       - name: Run data analysis
         run: |
-          python analysis.py  # This will read and process the 'cleaned_genomic_data.csv'
+          python analysis.py
 
-      # Run the visualization script
+      # Step 3: Run visualizations
       - name: Run visualizations
         run: |
-          python visualize.py  # This will generate visualizations and save them to './visualizations/'
-
-      # Upload visualizations as artifact
+          python visualize.py
+          
+      # Step 4: Upload the visualization results (e.g., saved as .png, .pdf, etc.)
       - name: Upload visualizations as artifact
         uses: actions/upload-artifact@v3
         with:
           name: visualizations
-          path: ./visualizations/*.png  # Ensure this path points to your visualizations directory
-          if-no-files-found: warn  # Don't fail the workflow if no files are found
+          path: ./visualizations/*.png  # Assuming visualizations are saved as PNG files
