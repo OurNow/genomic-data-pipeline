@@ -45,7 +45,7 @@ jobs:
         run: |
           ls -alh  # List files to debug and confirm if cleaned data exists
 
-      # Step 4: Upload cleaned genomic data
+      # Step 4: Upload cleaned genomic data as artifact
       - name: Upload cleaned genomic data
         uses: actions/upload-artifact@v3
         with:
@@ -104,9 +104,7 @@ jobs:
       # Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v3
-      # - name: List files in cleaned data directory
-      #   run: |
-      #     ls -alh ./cleaned_data
+
       # Set up AWS credentials to export data to S3
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -115,16 +113,19 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1  # Update with your preferred AWS region
 
-      # Upload cleaned genomic data to AWS S3
-      # - name: Upload cleaned data to AWS S3
-      #   run: |
-      #     aws s3 cp cleaned_real_time_genomic_data.csv s3://genomicbucket/cleaned_data/
-      #     # Replace 'genomicbucket' with your actual S3 bucket name
-      #     # Replace 'cleaned_data/' with your desired S3 directory path
+      # Download the cleaned genomic data artifact (you need to ensure it's downloaded)
+      - name: Download cleaned genomic data artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: cleaned-genomic-data
+          path: ./  # Make sure the file exists
 
-      # Upload visualization results to AWS S3
+      # Upload cleaned genomic data to AWS S3
+      - name: Upload cleaned genomic data to AWS S3
+        run: |
+          aws s3 cp ./cleaned_real_time_genomic_data.csv s3://genomicbucket/cleaned_data/
+
+      # Upload visualizations to AWS S3
       - name: Upload visualizations to AWS S3
         run: |
           aws s3 cp ./visualizations/ s3://genomicbucket/visualizations/ --recursive
-          # This will upload all files in the visualizations directory to your S3 bucket
-          # Adjust 'path/to/store/visualizations/' as needed
