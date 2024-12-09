@@ -95,49 +95,49 @@ jobs:
         with:
           name: visualizations
           path: ./visualizations/*.png  # Assuming visualizations are saved as PNG files
+
   export_to_aws:
-  needs: analysis_and_visualization  # Ensures export to AWS happens after analysis and visualization
-  runs-on: ubuntu-latest
+    needs: analysis_and_visualization  # Ensures export to AWS happens after analysis and visualization
+    runs-on: ubuntu-latest
 
-  steps:
-    # Checkout the repository
-    - name: Checkout code
-      uses: actions/checkout@v3
+    steps:
+      # Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    # Set up AWS credentials to export data to S3
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ap-south-1  # Update with your preferred AWS region
+      # Set up AWS credentials to export data to S3
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1  # Update with your preferred AWS region
 
-    # Download the cleaned genomic data artifact
-    - name: Download cleaned genomic data artifact
-      uses: actions/download-artifact@v3
-      with:
-        name: cleaned-genomic-data
-        path: ./  # Ensure the file exists
+      # Download the cleaned genomic data artifact
+      - name: Download cleaned genomic data artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: cleaned-genomic-data
+          path: ./  # Ensure the file exists
 
-    # Download the visualizations artifact
-    - name: Download visualizations artifact
-      uses: actions/download-artifact@v3
-      with:
-        name: visualizations
-        path: ./visualizations/  # Specify the correct path for visualizations
+      # Download the visualizations artifact
+      - name: Download visualizations artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: visualizations
+          path: ./visualizations/  # Specify the correct path for visualizations
 
-    # Check if the visualizations directory exists
-    - name: List files in the visualizations directory
-      run: |
-        ls -alh ./visualizations  # Check if the visualizations are correctly downloaded
+      # Check if the visualizations directory exists
+      - name: List files in the visualizations directory
+        run: |
+          ls -alh ./visualizations  # Check if the visualizations are correctly downloaded
 
-    # Upload cleaned genomic data to AWS S3
-    - name: Upload cleaned genomic data to AWS S3
-      run: |
-        aws s3 cp ./cleaned_real_time_genomic_data.csv s3://genomicbucket/cleaned_data/
+      # Upload cleaned genomic data to AWS S3
+      - name: Upload cleaned genomic data to AWS S3
+        run: |
+          aws s3 cp ./cleaned_real_time_genomic_data.csv s3://genomicbucket/cleaned_data/
 
-    # Upload visualizations to AWS S3
-    - name: Upload visualizations to AWS S3
-      run: |
-        aws s3 cp ./visualizations/ s3://genomicbucket/visualizations/ --recursive
-
+      # Upload visualizations to AWS S3
+      - name: Upload visualizations to AWS S3
+        run: |
+          aws s3 cp ./visualizations/ s3://genomicbucket/visualizations/ --recursive
