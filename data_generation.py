@@ -41,7 +41,7 @@ outlier_indices = np.random.choice(df.index, size=50, replace=False)
 df.loc[outlier_indices, 'ExpressionLevel'] = np.random.uniform(150, 500, size=50)  # Add extreme outliers
 
 # Save the DataFrame as a CSV file
-df.to_csv('cleaned_genomic_data.csv', index=False)
+df.to_csv('synthetic_genomic_data.csv', index=False)
 
 # Display the first few rows to verify the data
 print(df.head())
