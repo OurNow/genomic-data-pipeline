@@ -6,7 +6,7 @@ import os
 df = pd.read_csv('cleaned_real_time_genomic_data.csv')
 
 # Define your AWS S3 bucket and file path
-bucket_name = 'your-bucket-name'  # Replace with your S3 bucket name
+bucket_name = 'genomicbucket'  # Replace with your S3 bucket name
 file_name = 'cleaned_real_time_genomic_data.csv'  # Name of the file in the S3 bucket
 local_file_path = './cleaned_real_time_genomic_data.csv'  # Local path to the file
 
