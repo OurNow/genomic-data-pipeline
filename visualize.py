@@ -9,55 +9,38 @@ os.makedirs('./visualizations', exist_ok=True)
 # Load the cleaned genomic data
 df = pd.read_csv('cleaned_real_time_genomic_data.csv')
 
-# Check if the 'GeneID' and 'ExpressionLevel' columns exist
-if 'GeneID' not in df.columns or 'ExpressionLevel' not in df.columns:
-    print("Error: 'GeneID' or 'ExpressionLevel' column is missing.")
+# Check if the necessary columns exist
+if 'GeneID' not in df.columns:
+    print("Error: 'GeneID' column is missing.")
 else:
-    print("Both 'GeneID' and 'ExpressionLevel' columns found.")
+    print("'GeneID' column found.")
 
-# Visualization 1: Boxplot of Expression Level Across Genes
+# Visualization 1: Countplot of Genes
 plt.figure(figsize=(12, 8))
-sns.boxplot(x="GeneID", y="ExpressionLevel", data=df, palette="muted")
-plt.title("Box Plot of Expression Level Across Genes")
+sns.countplot(x="GeneID", data=df, palette="muted", order=df['GeneID'].value_counts().index)
+plt.title("Countplot of Genes")
 plt.xlabel("Gene ID")
-plt.ylabel("Expression Level")
+plt.ylabel("Count")
 plt.xticks(rotation=90)
-plt.savefig('./visualizations/expression_boxplot.png')  # Save the plot as a PNG
+plt.savefig('./visualizations/gene_countplot.png')  # Save the plot as a PNG
 
-# Visualization 2: Histogram of Expression Levels
+# Visualization 2: Start vs. End Position of Genes
 plt.figure(figsize=(12, 8))
-sns.histplot(df['ExpressionLevel'], kde=True, color='skyblue')
-plt.title("Distribution of Expression Levels")
-plt.xlabel("Expression Level")
-plt.ylabel("Frequency")
-plt.savefig('./visualizations/expression_histogram.png')  # Save as another PNG
+sns.scatterplot(x="StartPosition", y="EndPosition", hue="Strand", data=df, palette="coolwarm")
+plt.title("Start vs. End Position of Genes")
+plt.xlabel("Start Position")
+plt.ylabel("End Position")
+plt.legend(title="Strand")
+plt.savefig('./visualizations/start_vs_end_positions.png')  # Save as another PNG
 
-# Visualization 3: Violin Plot of Expression Level Across Genes
-plt.figure(figsize=(12, 8))
-sns.violinplot(x="GeneID", y="ExpressionLevel", data=df, palette="muted")
-plt.title("Violin Plot of Expression Level Across Genes")
-plt.xlabel("Gene ID")
-plt.ylabel("Expression Level")
-plt.xticks(rotation=90)
-plt.savefig('./visualizations/expression_violinplot.png')  # Save as PNG
-
-# Visualization 4: Pairplot (ExpressionLevel vs GeneID)
-# Since SNP_Index is not needed, let's pair 'ExpressionLevel' with 'GeneID'
-# 'GeneID' is categorical, but we'll treat it as a factor for visualization purposes
-plt.figure(figsize=(12, 8))
-sns.pairplot(df, hue="GeneID", vars=["ExpressionLevel"])
-plt.savefig('./visualizations/expression_pairplot.png')  # Save pairplot as PNG
-
-# Additional visualizations can be added in a similar way
-# Example: Countplot of SNP occurrences (optional if SNP column exists)
-if 'SNP' in df.columns:
+# Visualization 3: Distribution of Gene Biotypes
+if 'GeneBiotype' in df.columns:
     plt.figure(figsize=(12, 8))
-    sns.countplot(x="SNP", data=df, palette="viridis")
-    plt.title("Countplot of SNP Occurrences")
-    plt.xlabel("SNP")
-    plt.ylabel("Count")
-    plt.xticks(rotation=90)
-    plt.savefig('./visualizations/snp_countplot.png')  # Save as PNG
+    sns.countplot(y="GeneBiotype", data=df, palette="viridis", order=df['GeneBiotype'].value_counts().index)
+    plt.title("Distribution of Gene Biotypes")
+    plt.xlabel("Count")
+    plt.ylabel("Gene Biotype")
+    plt.savefig('./visualizations/gene_biotype_distribution.png')  # Save as PNG
 
 # Ensure that all visualizations are saved in the 'visualizations' folder
 print("Visualizations saved successfully.")
