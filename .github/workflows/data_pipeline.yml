@@ -5,10 +5,10 @@ on:
     - cron: '30 18 * * *'  # Runs daily at 18:30 UTC (Midnight IST)
   push:  # Trigger the workflow on push
     branches:
-      - main
+      - '**'  # Triggers on all branches
   pull_request:  # Trigger on pull requests
     branches:
-      - main
+      - '**'  # Triggers on all branches
   workflow_dispatch:  # Allow manual triggers via the GitHub Actions UI
 
 jobs:
