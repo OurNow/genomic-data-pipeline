@@ -3,10 +3,10 @@ name: Genomic Data Pipeline
 on:
   push:
     branches:
-      - master  # Trigger on any commit to the 'main' branch
+      - master  # Trigger on any commit to the 'master' branch
   pull_request:
     branches:
-      - master  # Trigger on pull requests to the 'main' branch
+      - master  # Trigger on pull requests to the 'master' branch
   schedule:
     - cron: '30 18 * * *'  # Runs daily at midnight IST (18:30 UTC)
 
@@ -18,7 +18,7 @@ jobs:
       # Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v3
-
+      
       # Set up Python
       - name: Set up Python
         uses: actions/setup-python@v3
@@ -45,13 +45,15 @@ jobs:
         run: |
           ls -alh  # List files to debug and confirm if cleaned data exists
 
-      # Step 4: Upload cleaned genomic data to S3
-      - name: Upload cleaned genomic data to AWS S3
-        run: |
-          aws s3 cp cleaned_real_time_genomic_data.csv s3://genomicbucket/cleaned_data/
+      # Step 4: Upload cleaned genomic data
+      - name: Upload cleaned genomic data
+        uses: actions/upload-artifact@v3
+        with:
+          name: cleaned-genomic-data
+          path: cleaned_real_time_genomic_data.csv  # Correct file name here
 
   analysis_and_visualization:
-    needs: generate_and_process_data
+    needs: generate_and_process_data  # Ensures this job runs after the generate_and_process_data job
     runs-on: ubuntu-latest
 
     steps:
@@ -95,7 +97,7 @@ jobs:
           path: ./visualizations/*.png  # Assuming visualizations are saved as PNG files
 
   export_to_aws:
-    needs: analysis_and_visualization
+    needs: analysis_and_visualization  # Ensures export to AWS happens after analysis and visualization
     runs-on: ubuntu-latest
 
     steps:
@@ -111,17 +113,16 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1  # Update with your preferred AWS region
 
-      # Step 1: List files to confirm the cleaned data exists
-      - name: List files to confirm cleaned data exists
-        run: |
-          ls -alh  # List files to confirm if cleaned data exists
-
-      # Step 2: Upload cleaned genomic data to AWS S3
-      - name: Upload cleaned genomic data to AWS S3
+      # Upload cleaned genomic data to AWS S3
+      - name: Upload cleaned data to AWS S3
         run: |
           aws s3 cp cleaned_real_time_genomic_data.csv s3://genomicbucket/cleaned_data/
+          # Replace 'genomicbucket' with your actual S3 bucket name
+          # Replace 'cleaned_data/' with your desired S3 directory path
 
-      # Step 3: Upload visualizations to AWS S3
+      # Upload visualization results to AWS S3
       - name: Upload visualizations to AWS S3
         run: |
           aws s3 cp ./visualizations/ s3://genomicbucket/visualizations/ --recursive
+          # This will upload all files in the visualizations directory to your S3 bucket
+          # Adjust 'path/to/store/visualizations/' as needed
