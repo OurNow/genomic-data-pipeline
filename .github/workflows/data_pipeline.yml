@@ -5,10 +5,10 @@ name: Genomic Data Pipeline
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
     branches:
-      - main
+      - master
 
 jobs:
   generate_and_process_data:
