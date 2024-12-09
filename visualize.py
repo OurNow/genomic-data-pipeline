@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 os.makedirs('./visualizations', exist_ok=True)
 
 # Load the cleaned genomic data
-df = pd.read_csv('cleaned_genomic_data.csv')
+df = pd.read_csv('cleaned_real_time_genomic_data.csv')
 
 # Check if the 'GeneID' and 'ExpressionLevel' columns exist
 if 'GeneID' not in df.columns or 'ExpressionLevel' not in df.columns:
