@@ -3,12 +3,16 @@ name: Genomic Data Pipeline
 on:
   push:
     branches:
-      - main
+      - master  # Trigger on any commit to the 'main' branch
   pull_request:
     branches:
-      - main
+      - master  # Trigger on pull requests to the 'main' branch
   schedule:
-    - cron: '30 18 * * *'  # Runs daily at 18:30 UTC (Midnight IST)
+    - cron: '30 18 * * *'  # Runs daily at midnight IST (18:30 UTC)
+  # Trigger on any commit or update to the repository
+  commit:
+    branches:
+      - master  # Trigger on commit updates to 'main' branch
 
 jobs:
   generate_and_process_data:
