@@ -8,7 +8,7 @@ on:
     branches:
       - master  # Trigger on pull requests to the 'master' branch
   schedule:
-    - cron: '30 18 * * *'  # Runs daily at midnight IST (18:30 UTC)
+    - cron: '30 18 * * 1'  # Runs every Monday at midnight IST (18:30 UTC)
 
 jobs:
   generate_and_process_data:
