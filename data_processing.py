@@ -10,7 +10,7 @@ df_clean = df.dropna()  # Or apply other cleaning steps
 # df_clean['ExpressionLevel'] = df_clean['ExpressionLevel'].astype(float)
 
 # Save the cleaned data
-df_clean.to_csv('cleaned_real_time_genomic_data.csv', index=False)
+df_clean.to_csv('./cleaned_data/cleaned_real_time_genomic_data.csv', index=False)
 
 # Optionally, print the first few rows to verify
 print(df_clean.head())
