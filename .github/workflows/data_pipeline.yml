@@ -10,9 +10,9 @@ on:
   schedule:
     - cron: '30 18 * * *'  # Runs daily at midnight IST (18:30 UTC)
   # Trigger on any commit or update to the repository
-  commit:
-    branches:
-      - master  # Trigger on commit updates to 'main' branch
+  # commit:
+  #   branches:
+  #     - master  # Trigger on commit updates to 'main' branch
 
 jobs:
   generate_and_process_data:
