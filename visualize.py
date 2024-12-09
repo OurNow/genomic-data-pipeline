@@ -1,20 +1,30 @@
-import matplotlib.pyplot as plt
-import seaborn as sns
+import os
 import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 
-# Load cleaned data into Pandas for visualization
+# Ensure the directory exists
+os.makedirs('./visualizations', exist_ok=True)
+
+# Load the cleaned genomic data
 df = pd.read_csv('cleaned_genomic_data.csv')
 
-# Histogram of Expression Levels
-plt.hist(df['ExpressionLevel'], bins=30, color='skyblue', edgecolor='black')
+# Visualization 1: Boxplot
+plt.figure(figsize=(12, 8))
+sns.boxplot(x="GeneID", y="ExpressionLevel", data=df, palette="muted")
+plt.title("Box Plot of Expression Level Across Genes")
+plt.xlabel("Gene ID")
+plt.ylabel("Expression Level")
+plt.xticks(rotation=90)
+plt.savefig('./visualizations/expression_boxplot.png')  # Save the plot as a PNG
+
+# Additional visualizations can be added in a similar way
+# Example: Histogram of Expression Levels
+plt.figure(figsize=(12, 8))
+sns.histplot(df['ExpressionLevel'], kde=True, color='skyblue')
 plt.title("Distribution of Expression Levels")
 plt.xlabel("Expression Level")
 plt.ylabel("Frequency")
-plt.savefig('histogram.png')
+plt.savefig('./visualizations/expression_histogram.png')  # Save as another PNG
 
-# Boxplot of Expression Level by SNP
-sns.boxplot(x="SNP", y="ExpressionLevel", data=df, palette="Set2")
-plt.title("Box Plot of Expression Level by SNP")
-plt.xlabel("SNP")
-plt.ylabel("Expression Level")
-plt.savefig('boxplot.png')
+# Add any other visualizations you'd like to save here
