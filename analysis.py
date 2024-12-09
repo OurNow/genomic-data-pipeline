@@ -5,7 +5,8 @@ from pyspark.sql.functions import avg, count
 spark = SparkSession.builder.appName("GenomicDataAnalysis").getOrCreate()
 
 # Load cleaned data
-df = spark.read.csv('cleaned_genomic_data.csv', header=True, inferSchema=True)
+df = spark.read.csv('./cleaned_genomic_data.csv', header=True, inferSchema=True)
+
 
 # Group by SNP and calculate average ExpressionLevel
 snp_avg = df.groupBy("SNP").agg(avg("ExpressionLevel").alias("AvgExpression"))
