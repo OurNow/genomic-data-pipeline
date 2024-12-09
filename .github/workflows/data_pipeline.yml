@@ -3,16 +3,12 @@ name: Genomic Data Pipeline
 on:
   push:
     branches:
-      - master  # Trigger on any commit to the 'main' branch
+      - master  # Trigger on any commit to the 'master' branch
   pull_request:
     branches:
-      - master  # Trigger on pull requests to the 'main' branch
+      - master  # Trigger on pull requests to the 'master' branch
   schedule:
     - cron: '30 18 * * *'  # Runs daily at midnight IST (18:30 UTC)
-  # Trigger on any commit or update to the repository
-  # commit:
-  #   branches:
-  #     - master  # Trigger on commit updates to 'main' branch
 
 jobs:
   generate_and_process_data:
@@ -57,7 +53,7 @@ jobs:
           path: cleaned_real_time_genomic_data.csv  # Correct file name here
 
   analysis_and_visualization:
-    needs: generate_and_process_data
+    needs: generate_and_process_data  # Ensures this job runs after the generate_and_process_data job
     runs-on: ubuntu-latest
 
     steps:
@@ -101,6 +97,7 @@ jobs:
           path: ./visualizations/*.png  # Assuming visualizations are saved as PNG files
 
   export_to_aws:
+    needs: analysis_and_visualization  # Ensures export to AWS happens after analysis and visualization
     runs-on: ubuntu-latest
 
     steps:
@@ -120,8 +117,8 @@ jobs:
       - name: Upload cleaned data to AWS S3
         run: |
           aws s3 cp cleaned_real_time_genomic_data.csv s3://genomicbucket/cleaned_data/
-          # Replace 'your-bucket-name' with your actual S3 bucket name
-          # Replace 'path/to/store/cleaned_data/' with your desired S3 directory path
+          # Replace 'genomicbucket' with your actual S3 bucket name
+          # Replace 'cleaned_data/' with your desired S3 directory path
 
       # Upload visualization results to AWS S3
       - name: Upload visualizations to AWS S3
