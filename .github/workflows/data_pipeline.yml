@@ -70,6 +70,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: cleaned-genomic-data
+          path: ./  # Download to the current directory
 
       # Step 2: Run analysis
       - name: Run data analysis
