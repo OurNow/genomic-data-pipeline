@@ -1,92 +1,98 @@
-# .github/workflows/data_pipeline.yml
-
-name: Genomic Data Pipeline
+name: Automated Ensembl Data Workflow
 
 on:
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
+  schedule:
+    - cron: '0 0 * * *'  # Runs daily at midnight UTC
 
 jobs:
-  generate_and_process_data:
+  check-ensembl-updates:
     runs-on: ubuntu-latest
-    
     steps:
-      # Checkout the repository
-      - name: Checkout code
+      - name: Fetch Ensembl Release Info
+        run: |
+          curl -s "https://rest.ensembl.org/info/rest?content-type=application/json" > ensembl_info.json
+      - name: Compare Release Version
+        id: check_version
+        run: |
+          # Extract release number from Ensembl API response
+          latest_release=$(jq -r '.release' ensembl_info.json)
+          
+          # Check if a record of the last known release exists
+          if [ -f last_release.txt ]; then
+            last_release=$(cat last_release.txt)
+          else
+            last_release=0
+          fi
+
+          echo "Latest Release: $latest_release"
+          echo "Last Known Release: $last_release"
+
+          # Update environment variable if new release is detected
+          if [ "$latest_release" -gt "$last_release" ]; then
+            echo "release_updated=true" >> $GITHUB_ENV
+            echo $latest_release > last_release.txt
+          else
+            echo "release_updated=false" >> $GITHUB_ENV
+          fi
+      - name: Upload Updated Release Info
+        if: env.release_updated == 'true'
+        uses: actions/upload-artifact@v3
+        with:
+          name: last-release
+          path: last_release.txt
+
+  run-pipeline:
+    needs: check-ensembl-updates
+    if: env.release_updated == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
         uses: actions/checkout@v3
-      
-      # Set up Python
+
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
-          python-version: '3.8'
+          python-version: 3.8
 
-      # Install dependencies from requirements.txt
-      - name: Install dependencies
+      - name: Install Dependencies
         run: |
           pip install -r requirements.txt
 
-      # Step 1: Generate synthetic genomic data
-      - name: Generate synthetic genomic data
+      - name: Run Data Generation
         run: |
           python data_generation.py
 
-      # Step 2: Process and clean the data
-      - name: Process and clean the data
+      - name: Run Data Processing
         run: |
           python data_processing.py
 
-      # Step 3: Upload cleaned data as artifact for later use
-      - name: Upload cleaned genomic data
-        uses: actions/upload-artifact@v3
-        with:
-          name: cleaned-genomic-data
-          path: cleaned_real_time_genomic_data.csv
-
-  analysis_and_visualization:
-    needs: generate_and_process_data
-    runs-on: ubuntu-latest
-
-    steps:
-      # Checkout the repository again
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      # Set up Python
-      - name: Set up Python
-        uses: actions/setup-python@v3
-        with:
-          python-version: '3.8'
-
-      # Install dependencies from requirements.txt
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-
-      # Step 1: Download the cleaned genomic data artifact
-      - name: Download cleaned genomic data artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: cleaned-genomic-data
-          path: ./  # Download to the current directory
-
-      # Step 2: Run analysis
-      - name: Run data analysis
+      - name: Run Analysis
         run: |
           python analysis.py
 
-      # Step 3: Run visualizations
-      - name: Run visualizations
+      - name: Run Visualization
         run: |
           python visualize.py
-          
-      # Step 4: Upload the visualization results (e.g., saved as .png, .pdf, etc.)
-      - name: Upload visualizations as artifact
+
+      - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: visualizations
-          path: ./visualizations/*.png  # Assuming visualizations are saved as PNG files
+          path: visualizations/*
+
+  save-last-release:
+    needs: check-ensembl-updates
+    if: env.release_updated == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Commit Last Release Version
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          echo ${{ env.release_updated }} > last_release.txt
+          git add last_release.txt
+          git commit -m "Update last known Ensembl release"
+          git push
