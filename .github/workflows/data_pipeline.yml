@@ -13,48 +13,11 @@ on:
 jobs:
   generate_and_process_data:
     runs-on: ubuntu-latest
-    
+
     steps:
       # Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v3
-      
-      # Set up Python
-      - name: Set up Python
-        uses: actions/setup-python@v3
-        with:
-          python-version: '3.8'
-
-      # Install dependencies from requirements.txt
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-
-      # Step 1: Generate synthetic genomic data
-      - name: Generate synthetic genomic data
-        run: |
-          python data_generation.py
-
-      # Step 2: Process and clean the data
-      - name: Process and clean the data
-        run: |
-          python data_processing.py
-
-      # Step 3: Upload cleaned data as artifact for later use
-      - name: Upload cleaned genomic data
-        uses: actions/upload-artifact@v3
-        with:
-          name: cleaned-genomic-data
-          path: cleaned_genomic_data.csv
-
-  analysis_and_visualization:
-    needs: generate_and_process_data
-    runs-on: ubuntu-latest
-
-    steps:
-      # Checkout the repository again
-      - name: Checkout code
-        uses: actions/checkout@v3
 
       # Set up Python
       - name: Set up Python
@@ -62,31 +25,32 @@ jobs:
         with:
           python-version: '3.8'
 
-      # Install dependencies from requirements.txt
+      # Install dependencies
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
 
-      # Step 1: Download the cleaned genomic data artifact
+      # Download the cleaned genomic data artifact (if applicable)
       - name: Download cleaned genomic data artifact
         uses: actions/download-artifact@v3
         with:
           name: cleaned-genomic-data
           path: ./  # Download to the current directory
 
-      # Step 2: Run analysis
+      # Run data analysis
       - name: Run data analysis
         run: |
           python analysis.py
 
-      # Step 3: Run visualizations
+      # Run the visualization script
       - name: Run visualizations
         run: |
           python visualize.py
-          
-      # Step 4: Upload the visualization results (e.g., saved as .png, .pdf, etc.)
+
+      # Upload visualizations as an artifact (make sure the path is correct)
       - name: Upload visualizations as artifact
         uses: actions/upload-artifact@v3
         with:
           name: visualizations
-          path: ./visualizations/*.png  # Assuming visualizations are saved as PNG files
+          path: ./visualizations/*.png  # Ensure this path points to your visualization directory
+          if-no-files-found: warn  # Prevent workflow failure if no files are found
